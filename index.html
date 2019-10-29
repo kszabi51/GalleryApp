@@ -2,8 +2,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 
 <!-- HTML of the component -->
-<div id="app">
-    <h1>{{ title }}</h1>
+<div id="app" class="container">
+    <div class="gallery">
+        <!-- Title -->
+        <h1>{{ title }} <small>Vue.js</small</h1>
+        <!-- Pictures -->
+        <div class="row">
+            <div v-for="photo in photos" class="photo-frame">
+                <div class="photo" :style="{ backgroundImage: 'url(' + photo.urlThumbnail + ')' }"></div>
+            </div>
+        </div>
+        <!-- Pager -->
+        <div class="row">
+            <div class="pager-frame">
+                <ul class="pager-frame">
+                    <li class="page active"><a href="#">1</a></li>
+                    <li class="page"><a href="#">2</a></li>
+                    <li class="page"><a href="#">3</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- JavaScript logic of the component -->
@@ -11,7 +30,103 @@
     vue = new Vue({
         el: '#app',
         data: {
-            title: 'Galéria Alkalmazás'
+            title: 'Gallery App',
+            photos: getPhotos()
         }
     });
+
+    // Returns the data of all the photos
+    function getPhotos(){
+        var pexelids = [
+        3130385, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2832023, 2739074, 2832023,
+        2739074, 2739074, 2832023,  2739074,  2739074, 2739074, 2832023, 2739074, 2739074, 3095293, 2739074, 2739074,
+        2739074, 2739074, 2739074, 2739074, 3095293, 3125852,  2739074, 3095293, 2739074, 2739074, 2739074, 3125852
+        ];
+
+        var photos = [];
+        pexelids.forEach(function(id,index) {
+            photos.push({
+                urlPhoto: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=300&h=200&auto=compress&cs=tinysrgb',
+                urlThumbnail: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
+                id: index
+            });
+        });
+
+        return photos;
+    };
 </script>
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=PT+Sans+Narrow');
+
+body { font-family: 'PT Sans Narrow', sans-serif; }
+
+.container {
+  max-width: 1500px;
+  margin: 10px auto;
+  clear: both;
+  text-align: center;
+}
+
+  .h1 { 
+    font-size: 3em;
+    color: #226;
+}
+  .small { 
+      font-size: 1em;
+       color: #888; 
+  }
+
+  .photo-frame {
+    width: 310px;
+    height: 210px;
+    padding: 5px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    margin: 5px;
+    float: left;
+    cursor: pointer;   
+  }
+  .photo {
+      width: 300px;
+      height: 200px;
+      border: 1px solid #aaa;
+      padding-left: 5px;
+      padding-top: 5px;
+      overflow: hidden;
+      background-position: top center;
+      background-size: cover;
+    }
+
+div.row {  
+    clear: both; 
+}
+
+ul.pager-frame {
+  display: inline-block;
+  clear: both;
+  text-align: center;
+  list-style-type: none;
+}
+
+li.page {
+    width: 40px;
+    border-radius: 50px 50px;
+    border: 1px solid #888;
+    float: left;
+    margin-left: 20px;
+    font-size: 2em;
+}
+    a:hover { 
+        background-color: #ccc;
+        cursor: pointer;  
+    }
+    a { 
+        text-decoration: none;
+        color: #222; 
+    }
+    a.active { 
+        background-color: #ddd; 
+    }
+
+</style>
