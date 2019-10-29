@@ -16,9 +16,9 @@
         <div class="row">
             <div class="pager-frame">
                 <ul class="pager-frame">
-                    <li class="page active"><a href="#">1</a></li>
-                    <li class="page"><a href="#">2</a></li>
-                    <li class="page"><a href="#">3</a></li>
+                    <li v-for="page in idxLastPage" class="page" :class="{ active: (idxCurrentPage+1) == page }" @click="paginate(page-1)">
+                        <a href="#">{{ page }}</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -27,13 +27,46 @@
 
 <!-- JavaScript logic of the component -->
 <script>
+var allPhotos = getPhotos();
+
     vue = new Vue({
-        el: '#app',
-        data: {
+        el: '#app', // Range
+        data: { //Data
             title: 'Gallery App',
-            photos: getPhotos()
+            allPhotos: allPhotos,
+            photos: [],
+            photosPerPage: 12,
+            idxLastPhoto: 0,
+            idxCurrentPage: 0,
+            idxLastPage: 0,
+        },
+        mounted: function() { // Runs at Startup
+            // initialize indexes
+            this.idxLastPhoto = this.allPhotos.length;
+            this.idxLastPage = Math.floor(this.allPhotos.length / this.photosPerPage);
+            
+            //show first page
+            this.paginate(0);
+        },
+        methods: { // Accessible methods
+            // Update arrays
+            paginate: function(idxPage) {
+                this.idxCurrentPage = idxPage;
+
+                // Interval
+                var idxStart = Math.floor(idxPage*this.photosPerPage);
+                var idxEnd = idxStart+this.photosPerPage > this.idxLastPhoto ? this.idxLastPhoto : idxStart+this.photosPerPage;
+
+                // Delete photos array's content
+                this.photos.splice(0, this.photos.length)
+
+                // rebuild visible photos
+                for(var idx = idxStart; idx < idxEnd; idx++) {
+                    this.photos.push(this.allPhotos[idx]);
+                }
+            }
         }
-    });
+});
 
     // Returns the data of all the photos
     function getPhotos(){
