@@ -8,7 +8,7 @@
         <h1>{{ title }} <small>Vue.js</small</h1>
         <!-- Pictures -->
         <div class="row">
-            <div v-for="photo in photos" class="photo-frame">
+            <div v-for="photo in photos" class="photo-frame" @click="showPhoto(photo.id)">
                 <div class="photo" :style="{ backgroundImage: 'url(' + photo.urlThumbnail + ')' }"></div>
             </div>
         </div>
@@ -21,6 +21,10 @@
                     </li>
                 </ul>
             </div>
+        </div>
+        <div id="overlay" v-show="isShowPhoto" @click="isShowPhoto=false"></div>
+        <div id="layout" v-show="isShowPhoto" @click="isShowPhoto=false">
+            <img :src="showPhotoUrl" alt="">
         </div>
     </div>
 </div>
@@ -39,6 +43,8 @@ var allPhotos = getPhotos();
             idxLastPhoto: 0,
             idxCurrentPage: 0,
             idxLastPage: 0,
+            isShowPhoto: false,
+            showPhotoUrl: ""
         },
         mounted: function() { // Runs at Startup
             // initialize indexes
@@ -64,6 +70,18 @@ var allPhotos = getPhotos();
                 for(var idx = idxStart; idx < idxEnd; idx++) {
                     this.photos.push(this.allPhotos[idx]);
                 }
+            },
+
+            showPhoto: function(id) {
+                var that = this;
+                // id alapján a fotó objektumának megkeresése
+                this.photos.forEach(function(photo) {
+                    if (photo.id === id) {
+                        that.showPhotoUrl = photo.urlPhoto; // a nagykép url-jének meghatározása
+                        that.isShowPhoto = true;            // a nagykép megjelenítése
+                        return;
+                    }
+                });
             }
         }
 });
