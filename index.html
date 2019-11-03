@@ -53,6 +53,14 @@ var allPhotos = getPhotos();
             
             //show first page
             this.paginate(0);
+
+            // If escape is pressed, close the picture
+            document.addEventListener("keydown", e => {
+                if(this.isShowPhoto && e.keyCode == 27)
+                {
+                    this.isShowPhoto = false;
+                }
+            });
         },
         methods: { // Accessible methods
             // Update arrays
