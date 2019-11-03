@@ -162,4 +162,37 @@ li.page {
         background-color: #ddd; 
     }
 
+/* Darkening background */
+#overlay {
+  position: fixed;
+  z-index: 10;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+/* Enlarged Photo is in this layer */
+#layout {
+  z-index: 11;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 95%;
+  margin-top: 50px;
+  text-align: center;
+}
+  
+#layout img {
+    margin: 40px auto 0;
+    max-width: 1260px;
+    width: 100%;
+    border: 1px solid #aaa;
+    box-shadow: 0 0 10px black;
+  }
+}
+
 </style>
