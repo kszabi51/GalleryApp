@@ -29,15 +29,7 @@
         {{ idxCurrentPhoto+1 }} / {{ idxLastPhoto+1 }}
       </div>
     </div>  
-  </div>
-  
-  <div class="container-fluid footer text-center">    
-    <p>A teljes cikket elolvashatod az ITHub-on. Klikkelj a logóra alább!</p>
-    <p><em>You can read the Hungarian full article on the ITHub. Click the logo below!</em></p>
-    <a href="https://ithub.hu/blog/post/Bevezetes-a-Vuejs-keretrendszerbe/" target="ithub">
-      <img src="https://ithub.hu/images/ithub-logo-dark.png" alt="ithub logo" style="width: 85px; height: auto;">    
-    </a>  
-  </div>
+</div>
 
 <!-- JavaScript logic of the component -->
 <script>
@@ -47,25 +39,26 @@ new Vue({
   el: '#app',
   data: {
     title: 'Cukor Család',
-    allPhotos: allPhotos, // all photos
-    photos: [],           // photos in the current page
-    photosPerPage: 12,    // photos per page
-    idxLastPhoto: 0,      // last photo's id
-    idxCurrentPage: 0,    // current photo's id
-    idxLastPage: 0,       // last page's id      
-    isShowPhoto: false,   // 
-    showPhotoUrl: '',     // selected photo url
-    idxCurrentPhoto: 0    // current photo index
+    allPhotos: allPhotos, // All photos from server
+    photos: [],           // Photos in the current page
+    photosPerPage: 12,    // Photos per page
+    idxLastPhoto: 0,      // Last photo id
+    idxCurrentPage: 0,    // Current page id
+    idxLastPage: 0,       // Last page id      
+    isShowPhoto: false,   // Is the photo enlarged?
+    showPhotoUrl: '',     // Selected photo url
+    idxCurrentPhoto: 0    // Current photo index
     
   }, 
   mounted: function() {    
-    // init indexes
+    // Initialize indexes
     this.idxLastPhoto = this.allPhotos.length-1;
     this.idxLastPage = Math.floor(this.allPhotos.length / this.photosPerPage); 
     
-    // show first page
+    // Show first page
     this.paginate(0);
     
+    // Close enlarged picture by Esc  
     document.addEventListener("keydown", e => {
       if (this.isShowPhoto && e.keyCode == 27) {
           this.isShowPhoto = false;
@@ -79,14 +72,14 @@ new Vue({
     paginate: function(idxPage) {
       this.idxCurrentPage = idxPage;
       
-      // determine period
+      // Determine period
       var idxStart = Math.floor(idxPage*this.photosPerPage); 
       var idxEnd = idxStart+this.photosPerPage>this.idxLastPhoto+1?this.idxLastPhoto:idxStart+this.photosPerPage;      
       
-      // drop the visible photos
+      // Clear photos array
       this.photos.splice(0, this.photos.length)      
       
-      // reload visible photos from all photo
+      // Reload visible photos from all photos
       for(var idx = idxStart; idx < idxEnd; idx++) {
         this.photos.push(this.allPhotos[idx]);                 
       }
@@ -287,33 +280,5 @@ ul.pager-frame li.page.active {
   text-shadow: 2px 2px 10px black;
   background-color: #ffffff88;
 }
-
-/** footer ***/
-.container-fluid {
-  width: 100%;
-  margin: 10px 0;
-  clear: both;
-}
-
-.footer {
-  background-color: #1B1C1D;
-  padding: 10px 10px;
-  color: white;
-  font-size: 20px;
-  font-family: arial;
-  text-height: 40px;
-}
-.footer em {
-  color: #aaa;
-}
-.footer a {
-  display: inline-block;
-  border: 1px solid #aaa;
-  border-radius: 10px;
-  padding: 10px;
-  color: #ddd;
-  text-decoration: none;
-}
-
-
+    
 </style>
