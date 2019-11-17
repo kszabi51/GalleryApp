@@ -122,16 +122,16 @@ new Vue({
  */
 function getPhotos() {
   var pexelIds = [
-    289225, 866019, 255349, 864939, 864990, 675927, 206529, 413727, 413998, 858117, 293029, 826349,
-    247199, 255332, 945813,  265705,  247298, 906052, 654690, 863977, 732420, 573299, 415829, 247322, 
-    207936, 394545, 594365, 715840, 819469, 746825,  413885, 774367, 269746, 206388, 235516, 805367
+  '0053_ijqLTrMi-', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T',
+  '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T',
+  '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T', '0052_0AYrJ8pO-T'
   ];
 
   var photos = [];
   pexelIds.forEach(function(id) {    
     photos.push({
-      urlPhoto: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-      urlThumbnail: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=400&h=400&auto=compress&cs=tinysrgb',
+      urlPhoto: 'https://ik.imagekit.io/zzvmwc1jdq/'+id+'.jpg',
+      urlThumbnail: 'https://ik.imagekit.io/zzvmwc1jdq/'+id+'.jpg',
       id: id
     });  
   });
@@ -239,7 +239,9 @@ ul.pager-frame li.page.active {
 #layout img {
   margin: 40px auto 0;
   max-width: 1260px;
-  width: 100%;
+  max-height: 800px;
+  width: auto;
+  height: auto;
   border: 1px solid #aaa;
   box-shadow: 0 0 10px black;
 }
