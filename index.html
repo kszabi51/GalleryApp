@@ -2,163 +2,191 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 
 <!-- HTML of the component -->
-<div id="app" class="container">
+<div id="app" class="container text-center">  
     <div class="gallery">
-        <!-- Title -->
-        <h1>{{ title }} <small>Vue.js</small</h1>
-        <!-- Pictures -->
-        <div class="row">
-            <div v-for="photo in photos" class="photo-frame" @click="showPhoto(photo.id)">
-                <div class="photo" :style="{ backgroundImage: 'url(' + photo.urlThumbnail + ')' }"></div>
-            </div>
+      <h1>{{ title }}</h1>    
+      <div class="row">
+        <div v-for="photo in photos" class="photo-frame" @click="showPhoto(photo.id)">   
+          <div class="photo" :style="{ backgroundImage: 'url(' + photo.urlThumbnail + ')' }"></div>      
+        </div>    
+      </div>
+      <div class="row">
+        <div class="pager-frame">
+          <ul class="pager-frame">
+            <li v-for="page in idxLastPage" class="page" :class="{ active: (idxCurrentPage+1) == page }" @click="paginate(page-1)">
+              <a href="#">{{ page }}</a> 
+            </li>         
+          </ul>           
         </div>
-        <!-- Pager -->
-        <div class="row">
-            <div class="pager-frame">
-                <ul class="pager-frame">
-                    <li v-for="page in idxLastPage" class="page" :class="{ active: (idxCurrentPage+1) == page }" @click="paginate(page-1)">
-                        <a href="#">{{ page }}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div id="overlay" v-show="isShowPhoto" @click="isShowPhoto=false"></div>
-        <div id="layout" v-show="isShowPhoto" @click="isShowPhoto=false">
-            <img :src="showPhotoUrl" alt="">
-        </div>
-    </div>
+      </div>
+    </div>  
+    <div id="overlay" v-show="isShowPhoto" @click="isShowPhoto=false"></div>  
+    <div id="layout" v-show="isShowPhoto" @click="isShowPhoto=false">
+      <img :src="showPhotoUrl" alt="">
+      <div class="prev" @click.stop="goPrevPhoto()">&lt;</div>
+      <div class="next" @click.stop="goNextPhoto()">&gt;</div>
+      <div class="status">
+        {{ idxCurrentPhoto+1 }} / {{ idxLastPhoto+1 }}
+      </div>
+    </div>  
 </div>
 
 <!-- JavaScript logic of the component -->
 <script>
 var allPhotos = getPhotos();
 
-    vue = new Vue({
-        el: '#app', // Range
-        data: { //Data
-            title: 'Gallery App',
-            allPhotos: allPhotos,
-            photos: [],
-            photosPerPage: 12,
-            idxLastPhoto: 0,
-            idxCurrentPage: 0,
-            idxLastPage: 0,
-            isShowPhoto: false,
-            showPhotoUrl: ""
-        },
-        mounted: function() { // Runs at Startup
-            // initialize indexes
-            this.idxLastPhoto = this.allPhotos.length;
-            this.idxLastPage = Math.floor(this.allPhotos.length / this.photosPerPage);
-            
-            //show first page
-            this.paginate(0);
-
-            // If escape is pressed, close the picture
-            document.addEventListener("keydown", e => {
-                if(this.isShowPhoto && e.keyCode == 27)
-                {
-                    this.isShowPhoto = false;
-                }
-            });
-        },
-        methods: { // Accessible methods
-            // Update arrays
-            paginate: function(idxPage) {
-                this.idxCurrentPage = idxPage;
-
-                // Interval
-                var idxStart = Math.floor(idxPage*this.photosPerPage);
-                var idxEnd = idxStart+this.photosPerPage > this.idxLastPhoto ? this.idxLastPhoto : idxStart+this.photosPerPage;
-
-                // Delete photos array's content
-                this.photos.splice(0, this.photos.length)
-
-                // rebuild visible photos
-                for(var idx = idxStart; idx < idxEnd; idx++) {
-                    this.photos.push(this.allPhotos[idx]);
-                }
-            },
-
-            showPhoto: function(id) {
-                var that = this;
-                // id alapján a fotó objektumának megkeresése
-                this.photos.forEach(function(photo) {
-                    if (photo.id === id) {
-                        that.showPhotoUrl = photo.urlPhoto; // a nagykép url-jének meghatározása
-                        that.isShowPhoto = true;            // a nagykép megjelenítése
-                        return;
-                    }
-                });
-            }
+new Vue({
+  el: '#app',
+  data: {
+    title: 'Cukor Család',
+    allPhotos: allPhotos, // All photos from server
+    photos: [],           // Photos in the current page
+    photosPerPage: 12,    // Photos per page
+    idxLastPhoto: 0,      // Last photo id
+    idxCurrentPage: 0,    // Current page id
+    idxLastPage: 0,       // Last page id      
+    isShowPhoto: false,   // Is the photo enlarged?
+    showPhotoUrl: '',     // Selected photo url
+    idxCurrentPhoto: 0    // Current photo index
+    
+  }, 
+  mounted: function() {    
+    // Initialize indexes
+    this.idxLastPhoto = this.allPhotos.length-1;
+    this.idxLastPage = Math.floor(this.allPhotos.length / this.photosPerPage); 
+    
+    // Show first page
+    this.paginate(0);
+    
+    // Close enlarged picture by Esc  
+    document.addEventListener("keydown", e => {
+      if (this.isShowPhoto && e.keyCode == 27) {
+          this.isShowPhoto = false;
+      }
+    });
+  },
+  methods: {
+    /** Paginate photos / Rebuild photos array
+     *
+     */
+    paginate: function(idxPage) {
+      this.idxCurrentPage = idxPage;
+      
+      // Determine period
+      var idxStart = Math.floor(idxPage*this.photosPerPage); 
+      var idxEnd = idxStart+this.photosPerPage>this.idxLastPhoto+1?this.idxLastPhoto:idxStart+this.photosPerPage;      
+      
+      // Clear photos array
+      this.photos.splice(0, this.photos.length)      
+      
+      // Reload visible photos from all photos
+      for(var idx = idxStart; idx < idxEnd; idx++) {
+        this.photos.push(this.allPhotos[idx]);                 
+      }
+    },
+    
+    /**
+     * Show image preview larger
+     */
+    showPhoto: function(id) {            
+      var that = this;
+      
+      // find photo data by id
+      this.allPhotos.forEach(function(photo, idx) {
+        if (photo.id === id) {     
+          // lock background and show photo
+          that.isShowPhoto = true;    
+          that.showPhotoUrl = photo.urlPhoto;      
+          that.idxCurrentPhoto = idx;
+          
+          // go top of the page
+          window.scrollTo(0,0);
         }
+      });
+    },
+    goPrevPhoto: function() {
+      var current = this.idxCurrentPhoto;      
+      this.showPhoto(this.allPhotos[current === 0 ? this.idxLastPhoto : current-1].id);
+      
+    },
+    goNextPhoto: function() {
+      var current = this.idxCurrentPhoto;      
+      this.showPhoto(this.allPhotos[current === this.idxLastPhoto ? 0 : current+1].id);      
+    }
+  }
 });
 
-    // Returns the data of all the photos
-    function getPhotos(){
-        var pexelids = [
-        3130385, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2739074, 2832023, 2739074, 2832023,
-        2739074, 2739074, 2832023,  2739074,  2739074, 2739074, 2832023, 2739074, 2739074, 3095293, 2739074, 2739074,
-        2739074, 2739074, 2739074, 2739074, 3095293, 3125852,  2739074, 3095293, 2739074, 2739074, 2739074, 3125852
-        ];
+/**
+ * Get photos from my imagekit.io storage and generate urls by ids
+ * @return array [{urlThumbnail, urlPhoto, idx}, ...]
+ */
+function getPhotos() {
+  var pexelIds = [
+    289225, 866019, 255349, 864939, 864990, 675927, 206529, 413727, 413998, 858117, 293029, 826349,
+    247199, 255332, 945813,  265705,  247298, 906052, 654690, 863977, 732420, 573299, 415829, 247322, 
+    207936, 394545, 594365, 715840, 819469, 746825,  413885, 774367, 269746, 206388, 235516, 805367
+  ];
 
-        var photos = [];
-        pexelids.forEach(function(id,index) {
-            photos.push({
-                urlPhoto: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=300&h=200&auto=compress&cs=tinysrgb',
-                urlThumbnail: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-                id: index
-            });
-        });
-
-        return photos;
-    };
+  var photos = [];
+  pexelIds.forEach(function(id) {    
+    photos.push({
+      urlPhoto: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
+      urlThumbnail: 'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?w=400&h=400&auto=compress&cs=tinysrgb',
+      id: id
+    });  
+  });
+  
+  return photos;
+};
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css?family=PT+Sans+Narrow');
-
-body { font-family: 'PT Sans Narrow', sans-serif; }
+@import url("https://fonts.googleapis.com/css?family=PT+Sans+Narrow");
+body {
+  font-family: 'PT Sans Narrow', sans-serif;
+}
 
 .container {
   max-width: 1500px;
   margin: 10px auto;
   clear: both;
+}
+
+.text-center {
   text-align: center;
 }
 
-  .h1 { 
-    font-size: 3em;
-    color: #226;
+.gallery h1 {
+  font-size: 3em;
+  color: #226;
 }
-  .small { 
-      font-size: 1em;
-       color: #888; 
-  }
+.gallery h1 small {
+  font-size: 1em;
+  color: #888;
+}
+.gallery .photo-frame {
+  width: 310px;
+  height: 210px;
+  padding: 5px;
+  border: 1px solid #eee;
+  background-color: #fafafa;
+  margin: 5px;
+  float: left;
+  cursor: pointer;
+}
+.gallery .photo-frame .photo {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #aaa;
+  padding-left: 5px;
+  padding-top: 5px;
+  overflow: hidden;
+  background-position: top center;
+  background-size: cover;
+}
 
-  .photo-frame {
-    width: 310px;
-    height: 210px;
-    padding: 5px;
-    border: 1px solid #eee;
-    background-color: #fafafa;
-    margin: 5px;
-    float: left;
-    cursor: pointer;   
-  }
-  .photo {
-      width: 300px;
-      height: 200px;
-      border: 1px solid #aaa;
-      padding-left: 5px;
-      padding-top: 5px;
-      overflow: hidden;
-      background-position: top center;
-      background-size: cover;
-    }
-
-div.row {  
-    clear: both; 
+div.row {
+  clear: both;
 }
 
 ul.pager-frame {
@@ -167,28 +195,26 @@ ul.pager-frame {
   text-align: center;
   list-style-type: none;
 }
-
-li.page {
-    width: 40px;
-    border-radius: 50px 50px;
-    border: 1px solid #888;
-    float: left;
-    margin-left: 20px;
-    font-size: 2em;
+ul.pager-frame li.page {
+  width: 40px;
+  border-radius: 50px 50px;
+  border: 1px solid #888;
+  float: left;
+  margin-left: 20px;
+  font-size: 2em;
 }
-    a:hover { 
-        background-color: #ccc;
-        cursor: pointer;  
-    }
-    a { 
-        text-decoration: none;
-        color: #222; 
-    }
-    a.active { 
-        background-color: #ddd; 
-    }
+ul.pager-frame li.page:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+ul.pager-frame li.page a {
+  text-decoration: none;
+  color: #222;
+}
+ul.pager-frame li.page.active {
+  background-color: #ddd;
+}
 
-/* Darkening background */
 #overlay {
   position: fixed;
   z-index: 10;
@@ -201,7 +227,6 @@ li.page {
   text-align: center;
 }
 
-/* Enlarged Photo is in this layer */
 #layout {
   z-index: 11;
   position: absolute;
@@ -211,14 +236,49 @@ li.page {
   margin-top: 50px;
   text-align: center;
 }
-  
 #layout img {
-    margin: 40px auto 0;
-    max-width: 1260px;
-    width: 100%;
-    border: 1px solid #aaa;
-    box-shadow: 0 0 10px black;
-  }
+  margin: 40px auto 0;
+  max-width: 1260px;
+  width: 100%;
+  border: 1px solid #aaa;
+  box-shadow: 0 0 10px black;
 }
-
+#layout .next, #layout .prev {
+  position: absolute;
+  top: 70px;
+  width: 40px;
+  height: 30px;
+  border: 2px solid #ffffff88;
+  border-radius: 50px 50px;
+  box-shadow: 2px 2px 10px black;
+  padding-top: 10px;
+  color: white;
+  text-shadow: 2px 2px 10px black;
+  cursor: pointer;
+}
+#layout .next:hover, #layout .prev:hover {
+  background-color: #ffffff22;
+  border-color: #ffffff;
+}
+#layout .prev {
+  left: 20px;
+}
+#layout .next {
+  right: 20px;
+}
+#layout .status {
+  position: absolute;
+  top: 70px;
+  right: 100px;
+  width: 50px;
+  height: 30px;
+  border: 2px solid #ffffff88;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px black;
+  padding-top: 10px;
+  color: white;
+  text-shadow: 2px 2px 10px black;
+  background-color: #ffffff88;
+}
+    
 </style>
